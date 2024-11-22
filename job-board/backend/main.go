@@ -12,10 +12,11 @@ import (
 	"job-board-backend/routes"
 
 	"github.com/gorilla/mux"
+	"github.com/rs/cors"
 )
 
 func main() {
-	// Connect to MongoDB
+
 	client := config.ConnectDb()
 	defer func() {
 		if err := client.Disconnect(context.TODO()); err != nil {
@@ -24,15 +25,21 @@ func main() {
 		log.Println("Disconnected from MongoDB")
 	}()
 
-	// Initialize router
 	r := mux.NewRouter()
 
-	// Define routes
 	routes.RegisterRoutes(r)
+
+	// Enable CORS
+	corsHandler := cors.New(cors.Options{
+		AllowedOrigins:   []string{"http://localhost:5173"},
+		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowedHeaders:   []string{"Content-Type", "Authorization"},
+		AllowCredentials: true,
+	}).Handler(r)
 
 	// Server configuration
 	server := &http.Server{
-		Handler:      r,
+		Handler:      corsHandler,
 		Addr:         ":8080",
 		WriteTimeout: 15 * time.Second,
 		ReadTimeout:  15 * time.Second,
@@ -57,7 +64,6 @@ func gracefulShutdown(server *http.Server) {
 
 	log.Println("Shutting down server...")
 
-	// Allow time for shutdown tasks
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
