@@ -1,23 +1,19 @@
-import { create } from "zustand";
+import { create } from 'zustand';
 
 const useAuthStore = create((set) => ({
-    userType: localStorage.getItem("userType") || null,
-    token: localStorage.getItem("token") || null,      
+    isLoggedIn: JSON.parse(localStorage.getItem('isLoggedIn')) || false,
+    userType: localStorage.getItem('userType') || null,
 
-    setUserType: (type) => {
-        localStorage.setItem("userType", type);          
-        set({ userType: type });                         
+    login: (userType) => {
+        localStorage.setItem('isLoggedIn', JSON.stringify(true));
+        localStorage.setItem('userType', userType);
+        set({ isLoggedIn: true, userType });
     },
 
-    setToken: (token) => {
-        localStorage.setItem("token", token);
-        set({ token });
-    },
-
-    clearAuthData: () => {
-        localStorage.removeItem("userType");             
-        localStorage.removeItem("token");                
-        set({ userType: null, token: null });            
+    logout: () => {
+        localStorage.removeItem('isLoggedIn');
+        localStorage.removeItem('userType');
+        set({ isLoggedIn: false, userType: null });
     },
 }));
 

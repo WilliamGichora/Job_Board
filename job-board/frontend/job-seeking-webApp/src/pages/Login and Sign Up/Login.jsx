@@ -1,38 +1,35 @@
-import { Link, navigate } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 import Aside from "./Aside"
 import { useState } from "react"
-import apiClient from "../../api/Axios";
 import useAuthStore from "../../stores/userAuthentication";
 
 function Login() {
 
-    const [emailTxt, setEmail] = useState('');
-    const [passwordTxt, setPassword] = useState('');
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
     const [error, setError] = useState('');
-    const setUserType = useAuthStore((state) => state.setUserType);
-    const setToken = useAuthStore((state) => state.setToken);
+    const { login } = useAuthStore();
+    const navigate = useNavigate();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        if (!emailTxt) return <div>Username is required </div>
-        if (!passwordTxt) return <div>Password is required </div>
+        if (!email) return <div>Username is required </div>
+        if (!password) return <div>Password is required </div>
 
         try {
-            const response = await apiClient.post("http://localhost:8080/api/login", { emailTxt, passwordTxt });
+            e.preventDefault();
+            const response = await fetch('http://localhost:8080/api/login', {
+                 method: 'POST',
+                 headers: { 'Content-Type': 'application/json' },
+                 body: JSON.stringify({ email, password }),
+             });
 
-            const { token, userType } = response.data;
-
-            setUserType(userType);
-            setToken(token);
-
-            const isAuthenticated = () => {
-                return localStorage.getItem('token') !== null;
-            };
-
-            if (isAuthenticated && userType === "jobSeeker") {
-                navigate("/job-seeker-homepage");
-            } else if (isAuthenticated && userType === "employer") {
-                navigate("/employer-homepage");
+            if (response.ok) {
+                const data = await response.json();
+                login(data.userType);
+                navigate(data.userType === 'jobSeeker' ? '/job-seeker-homepage' : '/employer-homepage');
+            } else {
+                alert('Invalid credentials');
             }
 
         } catch (error) {
@@ -56,7 +53,7 @@ function Login() {
                         <input
                             type="email"
                             id="email"
-                            value={emailTxt}
+                            value={email}
                             required
                             onChange={(e) => setEmail(e.target.value)}
                             className="w-full p-2 border-b border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -73,7 +70,7 @@ function Login() {
                             type="password"
                             id="password"
                             required
-                            value={passwordTxt}
+                            value={password}
                             onChange={(e) => setPassword(e.target.value)}
                             className="w-full p-2 border-b border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                         />

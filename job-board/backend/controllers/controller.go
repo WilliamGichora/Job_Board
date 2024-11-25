@@ -14,9 +14,9 @@ import (
 )
 
 func RegisterUser(w http.ResponseWriter, r *http.Request) {
+
 	var user models.User
 
-	// Parse the JSON request body
 	if err := json.NewDecoder(r.Body).Decode(&user); err != nil {
 		http.Error(w, "Invalid input", http.StatusBadRequest)
 		return
@@ -43,13 +43,39 @@ func RegisterUser(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusCreated)
 	json.NewEncoder(w).Encode(map[string]string{
-		"message": "User registered successfully",
-		"userId":  user.ID,
+		"message":  "User registered successfully",
+		"userId":   user.ID,
+		"userType": user.UserType,
 	})
 }
 
 func ValidateLoginDetails(w http.ResponseWriter, r *http.Request) {
+	var loginData models.LoginRequest
+	err := json.NewDecoder(r.Body).Decode(&loginData)
+	if err != nil {
+		fmt.Println("Error decoding request:", err)
+		http.Error(w, "Invalid request", http.StatusBadRequest)
+		return
+	}
 
+	collection := config.GetUserCollection()
+	var user models.User
+
+	query := bson.M{"email": loginData.Email, "password": loginData.Password}
+	fmt.Println("Querying database with:", query)
+
+	err = collection.FindOne(context.TODO(), query).Decode(&user)
+	if err != nil {
+		fmt.Println("Error finding user:", err)
+		http.Error(w, "Invalid credentials", http.StatusUnauthorized)
+		return
+	}
+
+	json.NewEncoder(w).Encode(map[string]string{
+		"message":  "Login successful",
+		"userType": user.UserType,
+		"userID":   user.ID,
+	})
 }
 
 func GetJobs(w http.ResponseWriter, r *http.Request) {
@@ -64,8 +90,4 @@ func CreateJob(w http.ResponseWriter, r *http.Request) {
 // Admin
 func editJobs() {
 
-}
-
-func Test(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "Testing servver")
 }

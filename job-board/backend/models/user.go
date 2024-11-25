@@ -12,3 +12,8 @@ type User struct {
 	UserType  string    `json:"userType" bson:"userType"` 
 	CreatedAt time.Time `json:"createdAt" bson:"createdAt"`
 }
+
+type LoginRequest struct {
+    Email    string `json:"email"` 
+    Password string `json:"password"` 
+}

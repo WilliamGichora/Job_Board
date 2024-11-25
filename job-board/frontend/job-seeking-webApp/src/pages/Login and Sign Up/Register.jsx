@@ -2,20 +2,24 @@ import { useState } from "react"
 import Aside from "./Aside"
 import { Link } from "react-router-dom"
 import apiClient from "../../api/Axios";
+import useAuthStore from "../../stores/userAuthentication";
+import { useNavigate } from "react-router-dom";
 
 function Register() {
 
-  const [fulllname, setFullname] = useState('');
+  const [fullname, setFullname] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [userType, setUserType] = useState("jobSeeker");
+  const { login } = useAuthStore();
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     try {
       const response = await apiClient.post("http://localhost:8080/api/register", {
-        fulllname,
+        fullname,
         email,
         password,
         userType
@@ -26,6 +30,10 @@ function Register() {
       setEmail('');
       setPassword('');
       setUserType('jobSeeker')
+
+      const data = await response.data;
+      login(data.userType);
+      navigate(data.userType === 'jobSeeker' ? '/job-seeker-homepage' : '/employer-homepage');
       
     } catch (error) {
       console.error("Error during registration",error.response?.data||error.message);
@@ -48,7 +56,7 @@ function Register() {
             <input
               type="text"
               id="text"
-              value={fulllname}
+              value={fullname}
               onChange={(e)=> setFullname(e.target.value)}
               className="w-full p-1 border-b border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
             />

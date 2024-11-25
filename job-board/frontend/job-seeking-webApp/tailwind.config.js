@@ -10,6 +10,9 @@ export default {
         specialBlue: {
           100: "#C4D7FF",
           500: '#5B86E5'
+        },
+        specialGrey: {
+          100: '#A6AEBF'
         }
       },
     },
