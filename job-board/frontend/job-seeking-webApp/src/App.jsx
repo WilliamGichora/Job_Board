@@ -7,6 +7,9 @@ import useAuthStore from './stores/userAuthentication';
 import ProtectedRoute from './routes/ProtectedRoute';
 import AppliedJobs from './pages/HomeNestedPages/AppliedJobs';
 import JobList from './components/JobList';
+import AdminViewJobs from './components/AdminViewJobs';
+import ApplyForm from './pages/HomeNestedPages/ApplyForm';
+
 
 function App() {
   const { isLoggedIn, userType } = useAuthStore();
@@ -44,8 +47,10 @@ function App() {
         }
       >
         <Route path="browse-jobs" element={<JobList/>} />
-        <Route path="applied-jobs" element={<AppliedJobs/>} />
+        <Route path="applied-jobs" element={<AppliedJobs />} />
+        
       </Route>
+      <Route path="/apply/:jobId" element={<ApplyForm />} />
 
       <Route
         path="/employer-homepage"
@@ -59,6 +64,7 @@ function App() {
           </ProtectedRoute>
         }
       >
+        <Route path='view-jobs' element={<AdminViewJobs />} errorElement={<div>Error: Unauthorized access to Employer Homepage</div>} />
 
       </Route>
     </Routes>

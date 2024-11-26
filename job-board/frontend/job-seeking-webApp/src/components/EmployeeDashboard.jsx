@@ -1,43 +1,58 @@
-import  { useState } from 'react';
+import { useState } from "react";
+import { useJobs } from "../api/ReactQuery";
+import AdminViewJobs from "./AdminViewJobs";
 
 const EmployeeDashboard = () => {
-    const [jobs, setJobs] = useState([]);
+    const [jobs, setJobs] = useState([]); // List of jobs
     const [jobForm, setJobForm] = useState({
-        title: '',
-        description: '',
-        locations: '',
+        title: "",
+        description: "",
+        short_desc: "",
+        locations: "",
+        employment_type: "",
+        salary: "",
+        experience: "",
+        company: "",
+        remote_option: false,
     });
 
-    const handlePostJob = (e) => {
-        e.preventDefault();
-        const newJob = {
-            id: `${Date.now()}`,
-            title: jobForm.title,
-            description: jobForm.description,
-            locations: jobForm.locations.split(',').map((loc) => loc.trim()),
-            postedTime: new Date(),
-            applicants: 0,
-            applications: [],
-        };
-        setJobs([...jobs, newJob]);
-        setJobForm({ title: '', description: '', locations: '' });
-    };
+    const { data: fetchedjobs, isLoading, isError } = useJobs();
 
-    const handleApproveApplicant = (jobId, applicantId) => {
-        setJobs((prevJobs) =>
-            prevJobs.map((job) =>
-                job.id === jobId
-                    ? {
-                        ...job,
-                        applications: job.applications.map((applicant) =>
-                            applicant.id === applicantId
-                                ? { ...applicant, status: 'Approved' }
-                                : applicant
-                        ),
-                    }
-                    : job
-            )
-        );
+    const handlePostJob = async (e) => {
+        e.preventDefault();
+
+        const newJob = {
+            ...jobForm,
+            locations: jobForm.locations.split(",").map((loc) => loc.trim()),
+        };
+
+        try {
+            const response = await fetch("http://localhost:8080/api/jobs", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(newJob),
+            });
+
+            if (response.ok) {
+                const createdJob = await response.json();
+                setJobs([...jobs, createdJob]); // Add new job to the UI
+                setJobForm({
+                    title: "",
+                    description: "",
+                    short_desc: "",
+                    locations: "",
+                    employment_type: "",
+                    salary: "",
+                    experience: "",
+                    company: "",
+                    remote_option: false,
+                });
+            } else {
+                console.error("Failed to post job");
+            }
+        } catch (error) {
+            console.error("Error posting job:", error);
+        }
     };
 
     return (
@@ -47,6 +62,7 @@ const EmployeeDashboard = () => {
             <section className="mb-8">
                 <h2 className="text-xl font-bold mb-4">Post a Job</h2>
                 <form onSubmit={handlePostJob} className="space-y-4 bg-white p-4 rounded shadow">
+
                     <div>
                         <label className="block font-medium">Job Title</label>
                         <input
@@ -57,6 +73,18 @@ const EmployeeDashboard = () => {
                             required
                         />
                     </div>
+
+                    <div>
+                        <label className="block font-medium">Short Description</label>
+                        <input
+                            type="text"
+                            className="w-full p-2 border rounded"
+                            value={jobForm.short_desc}
+                            onChange={(e) => setJobForm({ ...jobForm, short_desc: e.target.value })}
+                            required
+                        />
+                    </div>
+
                     <div>
                         <label className="block font-medium">Description</label>
                         <textarea
@@ -66,6 +94,7 @@ const EmployeeDashboard = () => {
                             required
                         />
                     </div>
+
                     <div>
                         <label className="block font-medium">Locations (comma-separated)</label>
                         <input
@@ -76,7 +105,76 @@ const EmployeeDashboard = () => {
                             required
                         />
                     </div>
-                    <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded">
+
+                    {/* Employment Type */}
+                    <div>
+                        <label className="block font-medium">Employment Type</label>
+                        <input
+                            type="text"
+                            className="w-full p-2 border rounded"
+                            value={jobForm.employment_type}
+                            onChange={(e) =>
+                                setJobForm({ ...jobForm, employment_type: e.target.value })
+                            }
+                            placeholder="e.g., Full-time, Part-time"
+                            required
+                        />
+                    </div>
+
+                    <div>
+                        <label className="block font-medium">Salary</label>
+                        <input
+                            type="text"
+                            className="w-full p-2 border rounded"
+                            value={jobForm.salary}
+                            onChange={(e) => setJobForm({ ...jobForm, salary: e.target.value })}
+                            placeholder="e.g., $50,000 - $70,000"
+                            required
+                        />
+                    </div>
+
+                    <div>
+                        <label className="block font-medium">Experience Level</label>
+                        <input
+                            type="text"
+                            className="w-full p-2 border rounded"
+                            value={jobForm.experience}
+                            onChange={(e) => setJobForm({ ...jobForm, experience: e.target.value })}
+                            placeholder="e.g., 3+ years"
+                            required
+                        />
+                    </div>
+
+                    {/* Company */}
+                    <div>
+                        <label className="block font-medium">Company</label>
+                        <input
+                            type="text"
+                            className="w-full p-2 border rounded"
+                            value={jobForm.company}
+                            onChange={(e) => setJobForm({ ...jobForm, company: e.target.value })}
+                            required
+                        />
+                    </div>
+
+                    {/* Remote Option */}
+                    <div>
+                        <label className="block font-medium">
+                            Remote Work Allowed?
+                        </label>
+                        <input
+                            type="checkbox"
+                            checked={jobForm.remote_option}
+                            onChange={(e) =>
+                                setJobForm({ ...jobForm, remote_option: e.target.checked })
+                            }
+                        />
+                    </div>
+
+                    <button
+                        type="submit"
+                        className="bg-blue-500 text-white px-4 py-2 rounded"
+                    >
                         Post Job
                     </button>
                 </form>
@@ -84,40 +182,9 @@ const EmployeeDashboard = () => {
 
             <section>
                 <h2 className="text-xl font-bold mb-4">Posted Jobs</h2>
-                {jobs.map((job) => (
-                    <div key={job.id} className="bg-white p-4 rounded shadow mb-4">
-                        <h3 className="font-bold">{job.title}</h3>
-                        <p>{job.description}</p>
-                        <p className="text-sm text-gray-500">Locations: {job.locations.join(', ')}</p>
-                        <p className="text-sm text-gray-500">Posted on: {job.postedTime.toLocaleString()}</p>
-                        <p className="text-sm text-gray-500">Applicants: {job.applicants}</p>
-
-                        {/* View Applicants */}
-                        <div className="mt-4">
-                            <h4 className="font-medium mb-2">Applicants:</h4>
-                            {job.applications.length > 0 ? (
-                                job.applications.map((applicant) => (
-                                    <div key={applicant.id} className="flex justify-between items-center p-2 border-b">
-                                        <div>
-                                            <p className="font-medium">{applicant.name}</p>
-                                            <p className="text-sm text-gray-500">{applicant.email}</p>
-                                            <p className="text-sm text-gray-500">Status: {applicant.status}</p>
-                                        </div>
-                                        <button
-                                            onClick={() => handleApproveApplicant(job.id, applicant.id)}
-                                            className="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600"
-                                            disabled={applicant.status === 'Approved'}
-                                        >
-                                            {applicant.status === 'Approved' ? 'Approved' : 'Approve'}
-                                        </button>
-                                    </div>
-                                ))
-                            ) : (
-                                <p className="text-sm text-gray-500">No applicants yet.</p>
-                            )}
-                        </div>
-                    </div>
+                {isLoading || isError ? <div>May be loading or if it takes too long, error</div> : (fetchedjobs.map((job) => <AdminViewJobs Eachjob={job} key={job._id} />
                 ))}
+
             </section>
         </div>
     );

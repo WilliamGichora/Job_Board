@@ -20,7 +20,7 @@ const Header = () => {
                     </>
                 ) : (
                     <>
-                        <a href="/employer-homepage/post-job" className="hover:text-yellow-400">Post a Job</a>
+                        <a href="/employer-homepage/view-jobs" className="hover:text-yellow-400">View Posted jobs</a>
                         <a href="/employer-homepage/view-applicants" className="hover:text-yellow-400">View Applicants</a>
                     </>
                 )}
