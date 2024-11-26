@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import useAuthStore from "../../stores/userAuthentication";
 
 const ApplyForm = () => {
     const [form, setForm] = useState({
@@ -10,7 +11,7 @@ const ApplyForm = () => {
     const [error, setError] = useState("");
     const navigate = useNavigate();
     const { jobId } = useParams();
-    console.log("Job ID from params:", typeof(jobId)); 
+    const loggedInEmail = useAuthStore(state => state.email); 
 
     const handleFileChange = (e) => {
         setForm({ ...form, resume: e.target.files[0] });
@@ -18,9 +19,9 @@ const ApplyForm = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        if(form.email!==loggedInEmail) return <div className="relative top-10 left-10">email must match logged in email</div>
         try {
             const appliedTime = new Date().toISOString();
-
             const applicationData = {
                 name: form.name,
                 email: form.email,

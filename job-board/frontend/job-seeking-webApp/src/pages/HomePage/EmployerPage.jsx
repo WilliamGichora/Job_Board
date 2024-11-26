@@ -2,24 +2,24 @@ import EmployeeDashboard from "../../components/EmployeeDashboard"
 import Footer from "../../components/Footer"
 import Header from "../../components/Header"
 import { Outlet, useMatch } from "react-router-dom"
-import { QueryClient,QueryClientProvider } from "@tanstack/react-query"
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 
 function EmployerPage() {
   const queryClient = new QueryClient();
   const isParentRoute = useMatch('/employer-homepage')
   return (
-    <div className="font-serif">
-      <Header />
-      {isParentRoute && (
-        <QueryClientProvider client={queryClient}>
-          <EmployeeDashboard />
-        </QueryClientProvider>
-          
-      )}
+    <QueryClientProvider client={queryClient}>
+      <div className="font-serif">
 
-      <Outlet/>
-      <Footer/>
-    </div>
+        <Header />
+        {isParentRoute && (
+          <EmployeeDashboard />
+        )}
+
+        <Outlet />
+        <Footer />
+      </div>
+    </QueryClientProvider >
   )
 }
 

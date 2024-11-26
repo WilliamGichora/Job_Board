@@ -32,7 +32,7 @@ function Register() {
       setUserType('jobSeeker')
 
       const data = await response.data;
-      login(data.userType);
+      login(data.userType,data.email);
       navigate(data.userType === 'jobSeeker' ? '/job-seeker-homepage' : '/employer-homepage');
       
     } catch (error) {

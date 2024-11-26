@@ -6,7 +6,6 @@ const fetchJobs = async () => {
     return response.data;
 };
 
-// Custom hook
 export const useJobs = () => {
     return useQuery(['jobs'], fetchJobs, {
         staleTime: 5 * 60 * 1000, 

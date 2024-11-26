@@ -4,26 +4,27 @@ import Footer from "../../components/Footer";
 import Header from "../../components/Header";
 import HeroSection from "../../components/HeroSection";
 import JobList from "../../components/JobList";
-import { QueryClient,QueryClientProvider } from "@tanstack/react-query";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 function JobSeekerPage() {
   const isParentRoute = useMatch("/job-seeker-homepage");
   const queryClient = new QueryClient();
 
   return (
-    <div className="bg-specialGrey-100 text-white">
-      <Header />
-      {isParentRoute && (
-        <QueryClientProvider client={queryClient}>
-          <HeroSection />
-          <Filters />
-          <JobList />
-        </QueryClientProvider>
-        
-      )}
-      <Outlet />
-      <Footer />
-    </div>
+    <QueryClientProvider client={queryClient}>
+      <div className="bg-specialGrey-100 text-white">
+        <Header />
+        {isParentRoute && (
+          <>
+            <HeroSection />
+            <Filters />
+            <JobList />
+          </>
+        )}
+        <Outlet />
+        <Footer />
+      </div>
+    </QueryClientProvider>
   );
 }
 

@@ -35,7 +35,7 @@ const EmployeeDashboard = () => {
 
             if (response.ok) {
                 const createdJob = await response.json();
-                setJobs([...jobs, createdJob]); // Add new job to the UI
+                setJobs([...jobs, createdJob]);
                 setJobForm({
                     title: "",
                     description: "",
@@ -47,6 +47,7 @@ const EmployeeDashboard = () => {
                     company: "",
                     remote_option: false,
                 });
+                window.location.reload();
             } else {
                 console.error("Failed to post job");
             }

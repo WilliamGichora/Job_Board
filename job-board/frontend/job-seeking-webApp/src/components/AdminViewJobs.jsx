@@ -1,5 +1,4 @@
 function AdminViewJobs({ Eachjob }) {
-    console.log("Eachjob object:", Eachjob);
 
     if (!Eachjob) {
         return <div>Invalid Job Data</div>;

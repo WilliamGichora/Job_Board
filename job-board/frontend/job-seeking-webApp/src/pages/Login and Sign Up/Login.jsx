@@ -26,7 +26,7 @@ function Login() {
 
             if (response.ok) {
                 const data = await response.json();
-                login(data.userType);
+                login(data.userType,data.email);
                 navigate(data.userType === 'jobSeeker' ? '/job-seeker-homepage' : '/employer-homepage');
             } else {
                 alert('Invalid credentials');

@@ -48,6 +48,7 @@ func RegisterUser(w http.ResponseWriter, r *http.Request) {
 		"message":  "User registered successfully",
 		"userId":   user.ID,
 		"userType": user.UserType,
+		"email":user.Email,
 	})
 }
 
@@ -77,13 +78,13 @@ func ValidateLoginDetails(w http.ResponseWriter, r *http.Request) {
 		"message":  "Login successful",
 		"userType": user.UserType,
 		"userID":   user.ID,
+		"email":user.Email,
 	})
 }
 
 func GetJobs(w http.ResponseWriter, r *http.Request) {
 	collection := config.GetJobCollection()
 
-	// Fetch all jobs
 	cursor, err := collection.Find(r.Context(), map[string]interface{}{})
 	if err != nil {
 		http.Error(w, "Failed to fetch jobs", http.StatusInternalServerError)
